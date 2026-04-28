@@ -1,5 +1,6 @@
-export default async function handler(req, res) {
-  const slug = req.query.slug;
+export default async function handler(request) {
+  const url = new URL(request.url);
+  const slug = url.pathname.split("/").pop();
 
   const r = await fetch(
     `https://cdjbwnjphimbgncbvdkj.supabase.co/functions/v1/og-event/${slug}`
@@ -7,7 +8,10 @@ export default async function handler(req, res) {
 
   const html = await r.text();
 
-  res.setHeader("Content-Type", "text/html; charset=utf-8");
-  res.setHeader("Cache-Control", "public, max-age=300");
-  res.status(200).send(html);
+  return new Response(html, {
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      "Cache-Control": "public, max-age=300"
+    }
+  });
 }
